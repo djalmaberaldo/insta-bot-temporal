@@ -10,7 +10,7 @@ import static java.time.Duration.ofSeconds;
 @ActivityInterface
 public interface InstaBotActivity {
 
-    String TASK_QUEUE = "jiraWorker-taskQueue";
+    String TASK_QUEUE = "instaWorker-taskQueue";
 
     static ActivityOptions activityOptions() {
         return ActivityOptions.newBuilder()

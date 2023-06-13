@@ -1,5 +1,6 @@
 package com.instagram.bot.workflow;
 
+import com.instagram.bot.activity.InstaBotActivity;
 import com.instagram.bot.workflow.api.InstaWorkflow;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.context.ApplicationContext;
@@ -32,7 +33,9 @@ public class InstaBotWorkflowsWorker extends InstaBotWorkflowsAbstractWorker {
 
     @Override
     protected Object[] getActivityImplementations() {
-        return new Object[]{};
+        return new Object[]{
+                applicationContext.getBean(InstaBotActivity.class),
+        };
     }
 
     @Override

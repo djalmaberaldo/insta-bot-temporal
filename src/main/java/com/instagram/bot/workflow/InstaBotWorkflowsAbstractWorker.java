@@ -1,12 +1,10 @@
 package com.instagram.bot.workflow;
 
-import com.uber.m3.tally.RootScopeBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import java.time.Duration;
 import javax.annotation.PostConstruct;
 import io.temporal.client.WorkflowClient;
-import io.temporal.common.reporter.MicrometerClientStatsReporter;
 import io.temporal.serviceclient.WorkflowServiceStubs;
 import io.temporal.serviceclient.WorkflowServiceStubsOptions;
 import io.temporal.worker.Worker;
@@ -21,7 +19,6 @@ public abstract class InstaBotWorkflowsAbstractWorker {
 
     @Value("localhost:7233")
     private String temporalUrl;
-
 
     protected InstaBotWorkflowsAbstractWorker(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
