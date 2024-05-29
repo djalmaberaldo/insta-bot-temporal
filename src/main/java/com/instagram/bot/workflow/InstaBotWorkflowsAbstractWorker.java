@@ -2,6 +2,8 @@ package com.instagram.bot.workflow;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 import javax.annotation.PostConstruct;
 import io.temporal.client.WorkflowClient;
@@ -11,7 +13,8 @@ import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
 import io.temporal.worker.WorkerOptions;
 
-
+@Component
+@RestController
 public abstract class InstaBotWorkflowsAbstractWorker {
     protected final ApplicationContext applicationContext;
     protected WorkflowClient workflowClient;

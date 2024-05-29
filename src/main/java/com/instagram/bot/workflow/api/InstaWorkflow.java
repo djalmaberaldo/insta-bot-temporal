@@ -15,20 +15,20 @@ public interface InstaWorkflow {
 
     interface Options {
         String WORKFLOWS_WORKER_TASK_QUEUE = "insta-bot-workflows-taskQueue";
+        String STATIC_ID = "Insta-Bot-Workflow";
 
         @NonNull
-        static WorkflowOptions get(String id) {
+        static WorkflowOptions get() {
             return WorkflowOptions.newBuilder()
                     .setTaskQueue(WORKFLOWS_WORKER_TASK_QUEUE)
-                    .setWorkflowId(id)
+                    .setWorkflowId(STATIC_ID)
                     .setWorkflowIdReusePolicy(WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE)
                     .setRetryOptions(RetryOptions.newBuilder()
                             .setInitialInterval(Duration.ofSeconds(30))
                             .setBackoffCoefficient(2D)
-                            .setMaximumInterval(ofMinutes(5))
+                            .setMaximumInterval(ofMinutes(1))
                             .validateBuildWithDefaults())
                     .validateBuildWithDefaults();
-
         }
     }
 

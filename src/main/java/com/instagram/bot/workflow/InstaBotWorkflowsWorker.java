@@ -2,7 +2,6 @@ package com.instagram.bot.workflow;
 
 import com.instagram.bot.activity.InstaBotActivity;
 import com.instagram.bot.workflow.api.InstaWorkflow;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import io.temporal.api.common.v1.WorkflowExecution;
@@ -27,7 +26,7 @@ public class InstaBotWorkflowsWorker extends InstaBotWorkflowsAbstractWorker {
     @Override
     protected Class<?>[] getWorkflowImplementationClasses() {
         return new Class[]{
-                InstaWorkflowImpl.class
+                InstaWorkflowImpl.class,
         };
     }
 
@@ -48,13 +47,17 @@ public class InstaBotWorkflowsWorker extends InstaBotWorkflowsAbstractWorker {
        startWorkflowIfNotStarted(InstaWorkflow.class,
                () -> WorkflowClient.start(() -> workflowClient.newWorkflowStub(
                        InstaWorkflow.class,
-                       InstaWorkflow.Options.get(RandomString.make()))
+                       InstaWorkflow.Options.get())
                        .process()));
     }
 
     private <T> void startWorkflowIfNotStarted(Class<T> type, Starter starter) {
         try {
-            starter.start();
+            WorkflowExecution execution = starter.start();
+            log.info("Workflow {} of type {} started under RunId {}",
+                    execution.getWorkflowId(),
+                    type.getSimpleName(),
+                    execution.getRunId());
         } catch (WorkflowExecutionAlreadyStarted alreadyStarted) {
             log.info("Workflow {} of type {} was already running under RunId {}, not restarting",
                     alreadyStarted.getExecution().getWorkflowId(),
