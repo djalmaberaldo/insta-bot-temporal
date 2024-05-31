@@ -22,8 +22,7 @@ public class InstaBotActivityImpl implements InstaBotActivity {
     public List<String> login() {
         String pattern = "/competition/calendar-results/results/";
         log.info("Logging in...");
-        WebDriverManager.firefoxdriver().clearDriverCache().setup();
-        driver = new FirefoxDriver();
+        driver = getDriver();
         driver.get("https://worldathletics.org/competition/calendar-results?hideCompetitionsWithNoResults=true");
         List<WebElement> elements = driver.findElements(By.xpath("//a[contains(@href, '" + pattern + "')]"));
         var list  = elements.stream().map(element-> element.getAttribute("href")).collect(Collectors.toList());
@@ -33,13 +32,18 @@ public class InstaBotActivityImpl implements InstaBotActivity {
 
     @Override
     public void readResults(String result) {
-        WebDriverManager.firefoxdriver().clearDriverCache().setup();
-        driver = new FirefoxDriver();
+        driver = getDriver();
         driver.get(result);
     }
 
     @Override
     public void likeByFeed() {
 
+    }
+
+    private WebDriver getDriver() {
+        WebDriverManager.firefoxdriver().clearDriverCache().setup();
+        driver = new FirefoxDriver();
+        return driver;
     }
 }
