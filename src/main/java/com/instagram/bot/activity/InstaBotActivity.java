@@ -1,5 +1,6 @@
 package com.instagram.bot.activity;
 
+import java.util.List;
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 import io.temporal.activity.ActivityOptions;
@@ -25,7 +26,7 @@ public interface InstaBotActivity {
     }
 
     @ActivityMethod
-    void login();
+    List<String> login();
 
     @ActivityMethod
     void likeByTags(String... tags);
