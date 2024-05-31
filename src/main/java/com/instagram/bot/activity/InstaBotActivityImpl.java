@@ -32,8 +32,10 @@ public class InstaBotActivityImpl implements InstaBotActivity {
     }
 
     @Override
-    public void likeByTags(String... tags) {
-
+    public void readResults(String result) {
+        WebDriverManager.firefoxdriver().clearDriverCache().setup();
+        driver = new FirefoxDriver();
+        driver.get(result);
     }
 
     @Override

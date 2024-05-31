@@ -15,7 +15,8 @@ public class InstaWorkflowImpl implements InstaWorkflow {
     @Override
     public void process() {
         log.info("Starting workflow...");
-        instaBotActivity.login();
+        var results = instaBotActivity.login();
+        instaBotActivity.readResults(results.get(0));
     }
 
     @Override

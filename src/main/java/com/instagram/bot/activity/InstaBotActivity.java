@@ -29,7 +29,7 @@ public interface InstaBotActivity {
     List<String> login();
 
     @ActivityMethod
-    void likeByTags(String... tags);
+    void readResults(String result);
 
     @ActivityMethod
     void likeByFeed();
