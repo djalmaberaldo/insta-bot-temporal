@@ -2,7 +2,6 @@ package com.instagram.bot.workflow;
 
 import com.instagram.bot.activity.InstaBotActivity;
 import com.instagram.bot.workflow.api.InstaWorkflow;
-import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import static io.temporal.workflow.Workflow.newActivityStub;
 
