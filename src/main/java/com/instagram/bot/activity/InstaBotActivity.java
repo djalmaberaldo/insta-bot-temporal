@@ -1,5 +1,6 @@
 package com.instagram.bot.activity;
 
+import com.instagram.bot.model.Competition;
 import java.util.List;
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
@@ -29,7 +30,7 @@ public interface InstaBotActivity {
     List<String> login();
 
     @ActivityMethod
-    void readResults(String result);
+    Competition readResults(String result);
 
     @ActivityMethod
     void likeByFeed();
