@@ -6,7 +6,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +23,10 @@ public class InstaBotActivityImpl implements InstaBotActivity {
 
     @SneakyThrows
     @Override
-    public List<String> login() {
+    public List<String> getLatestCompetitions() {
         String pattern = "/competition/calendar-results/results/";
         log.info("Logging in...");
-        driver = getDriver();
-        driver.get("https://worldathletics.org/competition/calendar-results?hideCompetitionsWithNoResults=true");
+        getDriver("https://worldathletics.org/competition/calendar-results?hideCompetitionsWithNoResults=true");
         List<WebElement> elements = driver.findElements(By.xpath("//a[contains(@href, '" + pattern + "')]"));
         var list  = elements.stream().map(element-> element.getAttribute("href")).collect(Collectors.toList());
         closeDriver();
@@ -36,9 +34,8 @@ public class InstaBotActivityImpl implements InstaBotActivity {
     }
 
     @Override
-    public Competition readResults(String link) {
-        driver = getDriver();
-        driver.get(link);
+    public Competition readResultsByCompetiton(String link) {
+        getDriver(link);
         Map<String, List<Result>> resultsForCompetition = new HashMap<>();
         List<WebElement> eventsHtml = driver.findElements(By.className("EventResults_eventResult__3oyX4"));
         var builder = builder();
@@ -50,18 +47,18 @@ public class InstaBotActivityImpl implements InstaBotActivity {
             WebElement tbody = element.findElement(By.tagName("tbody"));
             List<WebElement> rows = tbody.findElements(By.tagName("tr"));
 
-            log.info("Rows were found: {}", rows.size());
-            List<Result> results = new ArrayList<>();
+            List<Result> results = rows.stream()
+                    .map(row -> {
+                        List<WebElement> rowTds = row.findElements(By.tagName("td"));
+                        return Result.builder()
+                                .position(rowTds.get(0).getText())
+                                .athlete(rowTds.get(1).getText())
+                                .country(rowTds.get(3).findElement(By.className("Flags_name__28uFw")).getText())
+                                .mark(rowTds.get(4).getText())
+                                .build();
+                    }).collect(Collectors.toList());
 
-            for (WebElement row : rows) {
-                List<WebElement> rowTds = row.findElements(By.tagName("td"));
-                results.add(Result.builder()
-                        .position(rowTds.get(0).getText())
-                        .athlete(rowTds.get(1).getText())
-                        .country(rowTds.get(3).findElement(By.className("Flags_name__28uFw")).getText())
-                        .mark(rowTds.get(4).getText())
-                        .build());
-            }
+            log.info("Rows were found: {}", rows.size());
             resultsForCompetition.put(eventName, results);
         }
         closeDriver();
@@ -70,14 +67,14 @@ public class InstaBotActivityImpl implements InstaBotActivity {
     }
 
     @Override
-    public void likeByFeed() {
+    public void processByCompetition() {
 
     }
 
-    private WebDriver getDriver() {
+    private void getDriver(String url) {
         WebDriverManager.firefoxdriver().clearDriverCache().setup();
         driver = new FirefoxDriver();
-        return driver;
+        driver.get(url);
     }
 
     private void closeDriver() {

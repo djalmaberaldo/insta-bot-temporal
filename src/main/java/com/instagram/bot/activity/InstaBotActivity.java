@@ -27,11 +27,11 @@ public interface InstaBotActivity {
     }
 
     @ActivityMethod
-    List<String> login();
+    List<String> getLatestCompetitions();
 
     @ActivityMethod
-    Competition readResults(String result);
+    Competition readResultsByCompetiton(String result);
 
     @ActivityMethod
-    void likeByFeed();
+    void processByCompetition();
 }
