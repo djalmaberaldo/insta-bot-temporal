@@ -1,20 +1,20 @@
 package com.instagram.bot.workflow;
 
-import com.instagram.bot.activity.InstaBotActivity;
-import com.instagram.bot.workflow.api.InstaWorkflow;
+import com.instagram.bot.activity.BotActivity;
+import com.instagram.bot.workflow.api.ApplicationWorkflow;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import io.temporal.api.common.v1.WorkflowExecution;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowExecutionAlreadyStarted;
 import lombok.extern.slf4j.Slf4j;
-import static com.instagram.bot.workflow.api.InstaWorkflow.Options.WORKFLOWS_WORKER_TASK_QUEUE;
+import static com.instagram.bot.workflow.api.ApplicationWorkflow.Options.WORKFLOWS_WORKER_TASK_QUEUE;
 
 @Component
 @Slf4j
-public class InstaBotWorkflowsWorker extends InstaBotWorkflowsAbstractWorker {
+public class BotWorkflowsWorker extends BotWorkflowsAbstractWorker {
 
-    protected InstaBotWorkflowsWorker(ApplicationContext applicationContext) {
+    protected BotWorkflowsWorker(ApplicationContext applicationContext) {
         super(applicationContext);
     }
 
@@ -26,14 +26,14 @@ public class InstaBotWorkflowsWorker extends InstaBotWorkflowsAbstractWorker {
     @Override
     protected Class<?>[] getWorkflowImplementationClasses() {
         return new Class[]{
-                InstaWorkflowImpl.class,
+                AppplicationWorkflowImpl.class,
         };
     }
 
     @Override
     protected Object[] getActivityImplementations() {
         return new Object[]{
-                applicationContext.getBean(InstaBotActivity.class),
+                applicationContext.getBean(BotActivity.class),
         };
     }
 
@@ -44,10 +44,10 @@ public class InstaBotWorkflowsWorker extends InstaBotWorkflowsAbstractWorker {
 
     @Override
     protected void afterStart() {
-       startWorkflowIfNotStarted(InstaWorkflow.class,
+       startWorkflowIfNotStarted(ApplicationWorkflow.class,
                () -> WorkflowClient.start(() -> workflowClient.newWorkflowStub(
-                       InstaWorkflow.class,
-                       InstaWorkflow.Options.get())
+                       ApplicationWorkflow.class,
+                       ApplicationWorkflow.Options.get())
                        .process()));
     }
 

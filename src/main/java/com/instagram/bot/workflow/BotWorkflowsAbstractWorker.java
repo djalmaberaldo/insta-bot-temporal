@@ -15,7 +15,7 @@ import io.temporal.worker.WorkerOptions;
 
 @Component
 @RestController
-public abstract class InstaBotWorkflowsAbstractWorker {
+public abstract class BotWorkflowsAbstractWorker {
     protected final ApplicationContext applicationContext;
     protected WorkflowClient workflowClient;
     protected Worker worker;
@@ -23,7 +23,7 @@ public abstract class InstaBotWorkflowsAbstractWorker {
     @Value("localhost:7233")
     private String temporalUrl;
 
-    protected InstaBotWorkflowsAbstractWorker(ApplicationContext applicationContext) {
+    protected BotWorkflowsAbstractWorker(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 

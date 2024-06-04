@@ -1,11 +1,11 @@
 package com.instagram.bot.activity;
 
-import com.instagram.bot.workflow.InstaBotWorkflowsAbstractWorker;
+import com.instagram.bot.workflow.BotWorkflowsAbstractWorker;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BotWorker extends InstaBotWorkflowsAbstractWorker {
+public class BotWorker extends BotWorkflowsAbstractWorker {
 
     protected BotWorker(ApplicationContext applicationContext) {
         super(applicationContext);
@@ -13,7 +13,7 @@ public class BotWorker extends InstaBotWorkflowsAbstractWorker {
 
     @Override
     protected String getTaskQueue() {
-        return InstaBotActivity.TASK_QUEUE;
+        return BotActivity.TASK_QUEUE;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class BotWorker extends InstaBotWorkflowsAbstractWorker {
     @Override
     protected Object[] getActivityImplementations() {
         return new Object[]{
-                applicationContext.getBean(InstaBotActivity.class)
+                applicationContext.getBean(BotActivity.class)
         };
     }
 

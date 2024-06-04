@@ -10,7 +10,7 @@ import static java.time.Duration.ofMinutes;
 import static java.time.Duration.ofSeconds;
 
 @ActivityInterface
-public interface InstaBotActivity {
+public interface BotActivity {
 
     String TASK_QUEUE = "instaWorker-taskQueue";
 
@@ -30,7 +30,7 @@ public interface InstaBotActivity {
     List<String> getLatestCompetitions();
 
     @ActivityMethod
-    Competition readResultsByCompetiton(String result);
+    Competition readResultsByCompetiton(String result) throws Exception;
 
     @ActivityMethod
     void processByCompetition();

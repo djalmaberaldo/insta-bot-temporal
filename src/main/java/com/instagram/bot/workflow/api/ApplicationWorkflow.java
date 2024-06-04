@@ -11,7 +11,7 @@ import static io.temporal.api.enums.v1.WorkflowIdReusePolicy.WORKFLOW_ID_REUSE_P
 import static java.time.Duration.ofMinutes;
 
 @WorkflowInterface
-public interface InstaWorkflow {
+public interface ApplicationWorkflow {
 
     interface Options {
         String WORKFLOWS_WORKER_TASK_QUEUE = "insta-bot-workflows-taskQueue";
