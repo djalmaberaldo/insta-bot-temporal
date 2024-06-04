@@ -33,5 +33,5 @@ public interface BotActivity {
     Competition readResultsByCompetiton(String result) throws Exception;
 
     @ActivityMethod
-    void processByCompetition();
+    void processByCompetition() throws Exception;
 }

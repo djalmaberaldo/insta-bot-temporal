@@ -3,6 +3,7 @@ package com.instagram.bot.activity;
 import com.instagram.bot.model.Competition;
 import com.instagram.bot.session.BotSession;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.springframework.stereotype.Component;
 import java.util.HashMap;
@@ -70,9 +71,22 @@ public class BotActivityImpl implements BotActivity {
     }
 
     @Override
-    public void processByCompetition() {
-        String url = "https://x.com/i/flow/login";
-        botSession.getSession(url);
+    public void processByCompetition() throws Exception {
+        try (var session = botSession.getSession("https://x.com/i/flow/login")) {
+            var driver  = session.getDriver();
+            Thread.sleep(10000);
+            WebElement usernameInput = driver.findElement(By.tagName("input"));
+            usernameInput.sendKeys("");
+            usernameInput.sendKeys(Keys.TAB);
+            WebElement focusedElement = driver.switchTo().activeElement();
+
+            focusedElement.click();
+            Thread.sleep(10000);
+            focusedElement = driver.switchTo().activeElement();
+            focusedElement.sendKeys("");
+            Thread.sleep(10000);
+
+        }
     }
 
 }
