@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import io.temporal.failure.ApplicationFailure;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import static com.instagram.bot.model.Competition.*;
@@ -36,7 +37,7 @@ public class BotActivityImpl implements BotActivity {
     }
 
     @Override
-    public Competition readResultsByCompetiton(String link) throws Exception {
+    public Competition readResultsByCompetiton(String link)  {
         try (var session = botSession.getSession(link)) {
 
             var driver  = session.getDriver();
@@ -67,6 +68,8 @@ public class BotActivityImpl implements BotActivity {
                 resultsForCompetition.put(eventName, results);
             }
             return builder.results(resultsForCompetition).build();
+        } catch (Exception e) {
+            throw  ApplicationFailure.newNonRetryableFailure(e.getMessage(), "readResultsByCompetiton", e);
         }
     }
 

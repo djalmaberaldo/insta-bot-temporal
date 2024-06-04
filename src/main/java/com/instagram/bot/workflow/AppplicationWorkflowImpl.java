@@ -16,11 +16,7 @@ public class AppplicationWorkflowImpl implements ApplicationWorkflow {
     public void process() {
         log.info("Starting workflow...");
         var results = botActivity.getLatestCompetitions();
-        try {
-            botActivity.readResultsByCompetiton(results.get(0));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        botActivity.readResultsByCompetiton(results.get(0));
     }
 
     @Override

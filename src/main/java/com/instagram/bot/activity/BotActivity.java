@@ -30,7 +30,7 @@ public interface BotActivity {
     List<String> getLatestCompetitions();
 
     @ActivityMethod
-    Competition readResultsByCompetiton(String result) throws Exception;
+    Competition readResultsByCompetiton(String result);
 
     @ActivityMethod
     void processByCompetition() throws Exception;
