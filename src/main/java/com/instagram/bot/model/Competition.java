@@ -12,6 +12,7 @@ import lombok.Data;
 @JsonDeserialize(builder = Competition.CompetitionBuilder.class)
 public class Competition {
 
+    public String name;
     public Map<String, List<Result>> results;
 
     @Data

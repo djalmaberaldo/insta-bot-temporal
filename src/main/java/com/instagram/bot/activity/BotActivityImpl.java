@@ -43,6 +43,8 @@ public class BotActivityImpl implements BotActivity {
             var driver  = session.getDriver();
 
             Map<String, List<Result>> resultsForCompetition = new HashMap<>();
+            WebElement h1 = driver.findElement(By.tagName("h1"));
+
             List<WebElement> eventsHtml = driver.findElements(By.className("EventResults_eventResult__3oyX4"));
             var builder = builder();
             log.info("Events were found: {}", eventsHtml.size());
@@ -67,14 +69,14 @@ public class BotActivityImpl implements BotActivity {
                 log.info("Rows were found: {}", rows.size());
                 resultsForCompetition.put(eventName, results);
             }
-            return builder.results(resultsForCompetition).build();
+            return builder.name(h1.getText()).results(resultsForCompetition).build();
         } catch (Exception e) {
             throw  ApplicationFailure.newNonRetryableFailure(e.getMessage(), "readResultsByCompetiton", e);
         }
     }
 
     @Override
-    public void processByCompetition() throws Exception {
+    public void processByCompetition(Competition competition)  {
         try (var session = botSession.getSession("https://x.com/i/flow/login")) {
             var driver  = session.getDriver();
             Thread.sleep(10000);
@@ -88,7 +90,8 @@ public class BotActivityImpl implements BotActivity {
             focusedElement = driver.switchTo().activeElement();
             focusedElement.sendKeys("");
             Thread.sleep(10000);
-
+        } catch (Exception e) {
+            throw  ApplicationFailure.newNonRetryableFailure(e.getMessage(), "processByCompetition", e);
         }
     }
 
