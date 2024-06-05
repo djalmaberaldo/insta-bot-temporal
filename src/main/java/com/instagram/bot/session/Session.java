@@ -19,6 +19,9 @@ public class Session implements AutoCloseable {
         driver.get(url);
     }
 
+    public Session getSessionByBrowser(String url, BotSession.Browser browser) {
+        return null;
+    }
 
 
     @Override

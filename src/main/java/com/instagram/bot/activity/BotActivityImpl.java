@@ -7,9 +7,9 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +24,24 @@ import static com.instagram.bot.model.Competition.*;
 public class BotActivityImpl implements BotActivity {
 
     private final BotSession botSession;
+    private final String urlCompetitions;
+    private final String twitterUsername;
+    private final String twitterPassword;
 
-    public BotActivityImpl(BotSession botSession) {
+    public BotActivityImpl(BotSession botSession,
+                           @Value("${url.competitions}") String urlCompetitions,
+                           @Value("${twitter.username}") String twitterUsername,
+                           @Value("${twitter.password}") String twitterPassword) {
         this.botSession = botSession;
+        this.urlCompetitions = urlCompetitions;
+        this.twitterUsername = twitterUsername;
+        this.twitterPassword = twitterPassword;
     }
 
     @SneakyThrows
     @Override
     public List<String> getLatestCompetitions() {
-        try (var session = botSession.getSession("https://worldathletics.org/competition/calendar-results?hideCompetitionsWithNoResults=true")) {
+        try (var session = botSession.getSession(urlCompetitions)) {
             var driver  = session.getDriver();
 
             String pattern = "/competition/calendar-results/results/";
@@ -90,16 +99,16 @@ public class BotActivityImpl implements BotActivity {
     public void processByCompetition(Competition competition)  {
         try (var session = botSession.getSession("https://x.com/i/flow/login")) {
             var driver  = session.getDriver();
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
-            WebElement usernameInput = wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.tagName("input"))));
-            usernameInput.sendKeys("");
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(90));
+            Thread.sleep(10000);
+            WebElement usernameInput = driver.findElement(By.tagName("input"));
+            usernameInput.sendKeys(twitterUsername);
             usernameInput.sendKeys(Keys.TAB);
             WebElement focusedElement = driver.switchTo().activeElement();
 
             focusedElement.click();
-            focusedElement = wait.until(ExpectedConditions.elementToBeClickable(driver.switchTo().activeElement()));
-            focusedElement.sendKeys("");
+            focusedElement = wait.until(ExpectedConditions.visibilityOf(driver.switchTo().activeElement()));
+            focusedElement.sendKeys(twitterPassword);
         } catch (Exception e) {
             throw  ApplicationFailure.newFailure(e.getMessage(), "processByCompetition", e);
         }
