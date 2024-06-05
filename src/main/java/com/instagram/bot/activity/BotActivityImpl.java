@@ -5,7 +5,11 @@ import com.instagram.bot.session.BotSession;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
+import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +33,16 @@ public class BotActivityImpl implements BotActivity {
     @Override
     public List<String> getLatestCompetitions() {
         try (var session = botSession.getSession("https://worldathletics.org/competition/calendar-results?hideCompetitionsWithNoResults=true")) {
+            var driver  = session.getDriver();
+
             String pattern = "/competition/calendar-results/results/";
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
             log.info("Logging in...");
-            List<WebElement> elements = session.getDriver().findElements(By.xpath("//a[contains(@href, '" + pattern + "')]"));
+            List<WebElement> elements = wait.until(ExpectedConditions.visibilityOfAllElements(driver.findElements(By.xpath("//a[contains(@href, '" + pattern + "')]"))));
             return elements.stream().map(element-> element.getAttribute("href")).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw ApplicationFailure.newFailure(e.getMessage(), "getLatestCompetitions", e);
         }
     }
 
@@ -41,9 +51,10 @@ public class BotActivityImpl implements BotActivity {
         try (var session = botSession.getSession(link)) {
 
             var driver  = session.getDriver();
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
 
             Map<String, List<Result>> resultsForCompetition = new HashMap<>();
-            WebElement h1 = driver.findElement(By.tagName("h1"));
+            WebElement h1 = wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.tagName("h1"))));
 
             List<WebElement> eventsHtml = driver.findElements(By.className("EventResults_eventResult__3oyX4"));
             var builder = builder();
@@ -71,7 +82,7 @@ public class BotActivityImpl implements BotActivity {
             }
             return builder.name(h1.getText()).results(resultsForCompetition).build();
         } catch (Exception e) {
-            throw  ApplicationFailure.newNonRetryableFailure(e.getMessage(), "readResultsByCompetiton", e);
+            throw  ApplicationFailure.newFailure(e.getMessage(), "readResultsByCompetiton", e);
         }
     }
 
@@ -79,19 +90,18 @@ public class BotActivityImpl implements BotActivity {
     public void processByCompetition(Competition competition)  {
         try (var session = botSession.getSession("https://x.com/i/flow/login")) {
             var driver  = session.getDriver();
-            Thread.sleep(10000);
-            WebElement usernameInput = driver.findElement(By.tagName("input"));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+            WebElement usernameInput = wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.tagName("input"))));
             usernameInput.sendKeys("");
             usernameInput.sendKeys(Keys.TAB);
             WebElement focusedElement = driver.switchTo().activeElement();
 
             focusedElement.click();
-            Thread.sleep(10000);
-            focusedElement = driver.switchTo().activeElement();
+            focusedElement = wait.until(ExpectedConditions.elementToBeClickable(driver.switchTo().activeElement()));
             focusedElement.sendKeys("");
-            Thread.sleep(10000);
         } catch (Exception e) {
-            throw  ApplicationFailure.newNonRetryableFailure(e.getMessage(), "processByCompetition", e);
+            throw  ApplicationFailure.newFailure(e.getMessage(), "processByCompetition", e);
         }
     }
 
