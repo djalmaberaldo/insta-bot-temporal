@@ -2,8 +2,16 @@ package com.instagram.bot.activity;
 
 import com.instagram.bot.model.Competition;
 import com.instagram.bot.session.BotSession;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -13,11 +21,14 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import io.temporal.failure.ApplicationFailure;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import static com.instagram.bot.model.Competition.*;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @Component
 @Slf4j
@@ -89,29 +100,46 @@ public class BotActivityImpl implements BotActivity {
                 log.info("Rows were found: {}", rows.size());
                 resultsForCompetition.put(eventName, results);
             }
-            return builder.name(h1.getText()).results(resultsForCompetition).build();
+            return builder.uuid(UUID.randomUUID()).name(h1.getText()).results(resultsForCompetition).build();
         } catch (Exception e) {
             throw  ApplicationFailure.newFailure(e.getMessage(), "readResultsByCompetiton", e);
         }
     }
 
     @Override
-    public void processByCompetition(Competition competition)  {
-        try (var session = botSession.getSession("https://x.com/i/flow/login")) {
-            var driver  = session.getDriver();
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(90));
-            Thread.sleep(10000);
-            WebElement usernameInput = driver.findElement(By.tagName("input"));
-            usernameInput.sendKeys(twitterUsername);
-            usernameInput.sendKeys(Keys.TAB);
-            WebElement focusedElement = driver.switchTo().activeElement();
+    public void processByCompetition(Competition competition) {
+        String uri = "mongodb://localhost:27017";
+        ConnectionString connectionString = new ConnectionString(uri);
 
-            focusedElement.click();
-            focusedElement = wait.until(ExpectedConditions.visibilityOf(driver.switchTo().activeElement()));
-            focusedElement.sendKeys(twitterPassword);
-        } catch (Exception e) {
-            throw  ApplicationFailure.newFailure(e.getMessage(), "processByCompetition", e);
-        }
+        PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
+
+        // Create a CodecRegistry
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+
+        // Create a MongoClient with the custom CodecRegistry
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .codecRegistry(pojoCodecRegistry)
+                .build();
+
+
+        MongoClient mongoClient = MongoClients.create(settings);
+
+        // Get a database
+        MongoDatabase database = mongoClient.getDatabase("Bot-TF-Competitions");
+
+        // Get a collection
+        MongoCollection<Document> collection = database.getCollection("Competitions-Results");
+        log.info("Collection name: {}", collection.getNamespace().getCollectionName());
+
+        Document document = new Document();
+        document.append("name", competition.name);
+        document.append("results", competition.results);
+        collection.insertOne(document);
+
+        log.info("Inserted: {}", document);
+        // Close the client
+        mongoClient.close();
     }
 
 }

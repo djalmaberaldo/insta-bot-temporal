@@ -1,8 +1,10 @@
 package com.instagram.bot.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.bson.codecs.pojo.annotations.BsonId;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +14,8 @@ import lombok.Data;
 @JsonDeserialize(builder = Competition.CompetitionBuilder.class)
 public class Competition {
 
+    @BsonId
+    private UUID uuid;
     public String name;
     public Map<String, List<Result>> results;
 
