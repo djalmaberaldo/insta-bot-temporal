@@ -8,7 +8,9 @@ import java.util.UUID;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
+@Accessors(fluent = true)
 @Data
 @Builder
 @JsonDeserialize(builder = Competition.CompetitionBuilder.class)

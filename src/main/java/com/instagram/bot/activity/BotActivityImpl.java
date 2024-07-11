@@ -1,16 +1,10 @@
 package com.instagram.bot.activity;
 
+import com.instagram.bot.database.MongoConnection;
 import com.instagram.bot.model.Competition;
 import com.instagram.bot.session.BotSession;
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -27,8 +21,6 @@ import io.temporal.failure.ApplicationFailure;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import static com.instagram.bot.model.Competition.*;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @Component
 @Slf4j
@@ -36,17 +28,14 @@ public class BotActivityImpl implements BotActivity {
 
     private final BotSession botSession;
     private final String urlCompetitions;
-    private final String twitterUsername;
-    private final String twitterPassword;
+    private final MongoConnection mongoConnection;
 
     public BotActivityImpl(BotSession botSession,
                            @Value("${url.competitions}") String urlCompetitions,
-                           @Value("${twitter.username}") String twitterUsername,
-                           @Value("${twitter.password}") String twitterPassword) {
+                           MongoConnection mongoConnection) {
         this.botSession = botSession;
         this.urlCompetitions = urlCompetitions;
-        this.twitterUsername = twitterUsername;
-        this.twitterPassword = twitterPassword;
+        this.mongoConnection = mongoConnection;
     }
 
     @SneakyThrows
@@ -81,7 +70,6 @@ public class BotActivityImpl implements BotActivity {
             log.info("Events were found: {}", eventsHtml.size());
 
             for (WebElement element : eventsHtml) {
-                log.info("Event: {}" , element.findElement(By.tagName("h2")).getText());
                 String eventName = element.findElement(By.tagName("h2")).getText();
                 WebElement tbody = element.findElement(By.tagName("tbody"));
                 List<WebElement> rows = tbody.findElements(By.tagName("tr"));
@@ -108,25 +96,9 @@ public class BotActivityImpl implements BotActivity {
 
     @Override
     public void processByCompetition(Competition competition) {
-        String uri = "mongodb://localhost:27017";
-        ConnectionString connectionString = new ConnectionString(uri);
 
-        PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build();
-
-        // Create a CodecRegistry
-        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
-
-        // Create a MongoClient with the custom CodecRegistry
-        MongoClientSettings settings = MongoClientSettings.builder()
-                .applyConnectionString(connectionString)
-                .codecRegistry(pojoCodecRegistry)
-                .build();
-
-
-        MongoClient mongoClient = MongoClients.create(settings);
-
-        // Get a database
-        MongoDatabase database = mongoClient.getDatabase("Bot-TF-Competitions");
+        log.info("Processing competition name: {}", competition.name());
+        var database = mongoConnection.getMongoDatabase("Bot-TF-Competitions");
 
         // Get a collection
         MongoCollection<Document> collection = database.getCollection("Competitions-Results");
@@ -138,8 +110,6 @@ public class BotActivityImpl implements BotActivity {
         collection.insertOne(document);
 
         log.info("Inserted: {}", document);
-        // Close the client
-        mongoClient.close();
     }
 
 }
