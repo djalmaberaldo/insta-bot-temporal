@@ -27,6 +27,7 @@ public class BotWorkflowsWorker extends BotWorkflowsAbstractWorker {
     protected Class<?>[] getWorkflowImplementationClasses() {
         return new Class[]{
                 AppplicationWorkflowImpl.class,
+                CompetitionWorkflowImpl.class
         };
     }
 

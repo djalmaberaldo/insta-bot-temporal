@@ -108,8 +108,6 @@ public class BotActivityImpl implements BotActivity {
         document.append("name", competition.name);
         document.append("results", competition.results);
         collection.insertOne(document);
-
-        log.info("Inserted: {}", document);
     }
 
 }
